@@ -153,7 +153,7 @@
         });
 
 
-        // Globalne zmienne do przechowywania danych (zamiast useState)
+        // Globalne zmienne do przechowywania danych
         let reminders = [];
         let events = [];
         let loadingDateIdeas = false;
@@ -191,6 +191,25 @@
         modalOkBtn.addEventListener('click', () => {
             customModal.classList.add('hidden');
         });
+
+        // Funkcja do zapisywania danych w Local Storage
+        function saveDataToLocalStorage() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+            localStorage.setItem('events', JSON.stringify(events));
+        }
+
+        // Funkcja do ładowania danych z Local Storage
+        function loadDataFromLocalStorage() {
+            const storedReminders = localStorage.getItem('reminders');
+            const storedEvents = localStorage.getItem('events');
+
+            if (storedReminders) {
+                reminders = JSON.parse(storedReminders);
+            }
+            if (storedEvents) {
+                events = JSON.parse(storedEvents);
+            }
+        }
 
         // Funkcja do renderowania przypomnień
         function renderReminders() {
@@ -235,6 +254,7 @@
                     const id = parseInt(e.currentTarget.dataset.id);
                     reminders = reminders.filter(r => r.id !== id);
                     showCustomModal('Przypomnienie usunięte.');
+                    saveDataToLocalStorage(); // Zapisujemy po usunięciu
                     renderReminders();
                 });
             });
@@ -288,6 +308,7 @@
                     const id = parseInt(e.currentTarget.dataset.id);
                     events = events.filter(ev => ev.id !== id);
                     showCustomModal('Wydarzenie usunięte.');
+                    saveDataToLocalStorage(); // Zapisujemy po usunięciu
                     renderEvents();
                 });
             });
@@ -311,6 +332,7 @@
             newReminderDate.value = '';
             newReminderTime.value = '';
             showCustomModal('Przypomnienie dodane!');
+            saveDataToLocalStorage(); // Zapisujemy po dodaniu
             renderReminders();
         });
 
@@ -335,6 +357,7 @@
             newEventLocation.value = '';
             isDateEventCheckbox.checked = false;
             showCustomModal('Wydarzenie dodane!');
+            saveDataToLocalStorage(); // Zapisujemy po dodaniu
             renderEvents();
         });
 
@@ -394,8 +417,9 @@
             }
         });
 
-        // Inicjalne renderowanie po załadowaniu DOM
+        // Inicjalne ładowanie i renderowanie po załadowaniu DOM
         document.addEventListener('DOMContentLoaded', () => {
+            loadDataFromLocalStorage(); // Ładujemy dane przy starcie
             renderReminders();
             renderEvents();
         });
